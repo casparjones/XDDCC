@@ -1,0 +1,30 @@
+body {
+    font-family: 'Trebuchet MS', 'Comic Sans MS', sans-serif;
+    background: linear-gradient(135deg, #2d0a4e 0%, #c9184a 50%, #ff8500 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+    color: #fff;
+    padding: 40px 20px;
+}
+
+.content {
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.name {
+    font-size: 2.5em;
+    font-weight: bold;
+    color: #ffffff;
+    margin-top: 25px;
+}
+
+h1 {
+    font-size: 2.8em;
+    margin-top: 0;
+}
+
+h2 {
+    margin-top: 0;
+}
+

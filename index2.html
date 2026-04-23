@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Amazing Digital Circus – Charaktere</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Trebuchet MS', 'Comic Sans MS', sans-serif;
+    background: linear-gradient(135deg, #2d0a4e 0%, #c9184a 50%, #ff8500 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+    color: #fff;
+    padding: 40px 20px;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 50px;
+    text-shadow: 3px 3px 0 #000, -1px -1px 0 #ff00ff;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 6vw, 4rem);
+    letter-spacing: 2px;
+    background: linear-gradient(90deg, #ffea00, #ff00aa, #00e5ff, #ffea00);
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    animation: rainbow 6s linear infinite;
+    margin-bottom: 10px;
+  }
+
+  @keyframes rainbow {
+    to { background-position: 300% 0; }
+  }
+
+  .subtitle {
+    font-size: 1.1rem;
+    color: #fff;
+    opacity: 0.9;
+    font-style: italic;
+  }
+
+  .section-title {
+    font-size: 1.8rem;
+    text-align: center;
+    margin: 50px 0 25px;
+    color: #ffea00;
+    text-shadow: 2px 2px 0 #000;
+    letter-spacing: 1px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 25px;
+    max-width: 1300px;
+    margin: 0 auto;
+  }
+
+  .card {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 16px;
+    padding: 22px;
+    transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: conic-gradient(from 0deg, transparent, rgba(255, 234, 0, 0.1), transparent);
+    animation: spin 8s linear infinite;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .card:hover::before { opacity: 1; }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  .card:hover {
+    transform: translateY(-6px) scale(1.02);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+    border-color: #ffea00;
+  }
+
+  .card-content {
+    position: relative;
+    z-index: 1;
+  }
+
+  .name {
+    font-size: 1.6rem;
+    font-weight: bold;
+    margin-bottom: 6px;
+    color: #ffea00;
+    text-shadow: 2px 2px 0 #000;
+  }
+
+  .role {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #ff6bcb;
+    margin-bottom: 12px;
+    font-weight: bold;
+  }
+
+  .description {
+    font-size: 0.95rem;
+    line-height: 1.55;
+    color: #fff;
+  }
+
+  .badge {
+    display: inline-block;
+    background: rgba(255, 0, 102, 0.3);
+    border: 1px solid #ff6bcb;
+    border-radius: 12px;
+    padding: 3px 10px;
+    font-size: 0.75rem;
+    margin-top: 10px;
+    color: #fff;
+  }
+
+  .badge.abstract {
+    background: rgba(139, 0, 0, 0.5);
+    border-color: #ff0000;
+  }
+
+  .badge.ai {
+    background: rgba(0, 128, 255, 0.3);
+    border-color: #00aaff;
+  }
+
+  footer {
+    text-align: center;
+    margin-top: 60px;
+    padding: 20px;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.85rem;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🎪 The Amazing Digital Circus 🎪</h1>
+  <p class="subtitle">Willkommen im digitalen Zirkus – hier kommt niemand lebend raus!</p>
+</header>
+
+<h2 class="section-title">🎭 Die Hauptfiguren (Circus Members)</h2>
+<div class="grid">
+
+  <div class="card"><div class="card-content">
+    <div class="name">Pomni</div>
+    <div class="role">Protagonistin · Harlekin</div>
+    <p class="description">Eine 25-jährige Frau, die als Neuling im Zirkus ankommt. Mit ihrem zweifarbigen Jester-Kostüm und den großen, nervösen Augen ist sie das Gesicht der Serie. Vor dem Zirkus arbeitete sie als Buchhalterin für eine Supermarktkette und erkundete gerne verlassene Gebäude.</p>
+    <span class="badge">Neu im Zirkus</span>
+  </div></div>
+
+  <div class="card"><div class="card-content">
+    <div class="name">Ragatha</div>
+    <div class="role">Die Stoffpuppe</div>
+    <p class="description">Eine freundliche Stoffpuppe im Raggedy-Ann-Stil, die sich um die Neuankömmlinge kümmert. Im echten Leben stammte sie aus einer wohlhabenden Familie mit Farm, arbeitete in der Immobilienbranche und musste mit einer missbräuchlichen Mutter umgehen. Seit 2008 im Zirkus gefangen.</p>
+    <span class="badge">Mutterfigur</span>
+  </div></div>
+
+  <div class="card"><div class="card-content">
+    <div class="name">Jax</div>
+    <div class="role">Der lila Hase</div>
+    <p class="description">Ein gelbzähniger, lila Hase in Latzhose mit einer „nach mir die Sintflut"-Attitüde. Er geht mit dem Wahnsinn des Zirkus um, indem er gemein zu den anderen ist und Streiche spielt – z. B. indem er (angeblich) einen Tausendfüßler in Ragathas Zimmer legt.</p>
+    <span class="badge">Chaos-Stifter</span>
+  </div></div>
+
+  <div class="card"><div class="card-content">
+    <div class="name">Kinger</div>
+    <div class="role">Die Schachfigur (König)</div>
+    <p class="description">Ein älterer König aus dem Schachspiel, der schon halb verrückt ist. In Episode 8 wurde enthüllt, dass Kinger in der echten Welt einer der Mit-Entwickler von Caine war. Er ist mit Queenie verheiratet, die allerdings bereits abstrahiert ist.</p>
+    <span class="badge">Zirkus-Veteran</span>
+  </div></div>
+
+  <div class="card"><div class="card-content">
+    <div class="name">Gangle</div>
+    <div class="role">Die Band-Tänzerin</div>
+    <p class="description">Ein anmutiges Wesen aus Bändern mit einer zerbrechlichen Theatermaske als Gesicht. Sehr emotional und anfällig für Stimmungsschwankungen. Früher war sie Schichtleiterin in der Fast-Food-Branche und studierte Grafikdesign, brach das Studium aber ab.</p>
+    <span class="badge">Sensibel</span>
+  </div></div>
+
+  <div class="card"><div class="card-content">
+    <div class="name">Zooble</div>
+    <div class="role">Die geometrische Gestalt</div>
+    <p class="description">Ein humanoides Wesen aus verschiedenen Formen, Händen und Körperteilen, das auseinanderfallen kann. Zooble (they/them) will nichts mit den Abenteuern zu tun haben und möchte am liebsten in Ruhe gelassen werden. Im echten Leben Barkeeper und Tätowierer.</p>
+    <span class="badge">Einzelgänger</span>
+  </div></div>
+
+</div>
+
+<h2 class="section-title">🤖 Die KIs des Zirkus</h2>
+<div class="grid">
+
+  <div class="card"><div class="card-content">
+    <div class="name">Caine</div>
+    <div class="role">Der Zirkusdirektor</div>
+    <p class="description">Der charismatische, exzentrische Leiter des Digital Circus – eine KI mit einem riesigen Mund und zwei heterochromatischen Augen darin. Im roten Frack erschafft er Welten und Abenteuer für seine „Gäste". Ob er sadistisch ist oder einfach nicht versteht, was er anrichtet, bleibt lange offen.</p>
+    <span class="badge ai">Künstliche Intelligenz</span>
+  </div></div>
+
+  <div class="card"><div class="card-content">
+    <div class="name">Bubble</div>
+    <div class="role">Caines Assistent</div>
+    <p class="description">Eine sprechende Blase mit scharfen Zähnen und Caines treuer (und hungriger) Begleiter. Kocht gerne gigantische Festmahle und wird von Caine gelegentlich liebevoll als „Parasit" bezeichnet.</p>
+    <span class="badge ai">Künstliche Intelligenz</span>
+  </div></div>
+
+</div>
+
+<h2 class="section-title">💀 Die Abstrahierten</h2>
+<div class="grid">
+
+  <div class="card"><div class="card-content">
+    <div class="name">Kaufmo</div>
+    <div class="role">Der Clown</div>
+    <p class="description">Ein Clown in gelber Kleidung, der bereits in der Pilotfolge abstrahiert ist. Sein Zusammenbruch war der emotionale Auftakt der Serie. Ursprünglich war Kaufmo als Hauptcharakter geplant.</p>
+    <span class="badge abstract">Abstrahiert</span>
+  </div></div>
+
+  <div class="card"><div class="card-content">
+    <div class="name">Queenie</div>
+    <div class="role">Die Dame im Schach</div>
+    <p class="description">Eine burgunderrote Schach-Königin mit rotem Gewand – und Kingers Ehefrau. Sie ist bereits abstrahiert und taucht u. a. in "The Mystery of Mildenhall Manor" wieder auf.</p>
+    <span class="badge abstract">Abstrahiert</span>
+  </div></div>
+
+  <div class="card"><div class="card-content">
+    <div class="name">Ribbit</div>
+    <div class="role">Der Frosch</div>
+    <p class="description">Eine froschähnliche Figur mit Augen im Pie-Cut-Stil und pinker Fliege. Laut Gooseworx verwendet Ribbit die Pronomen sie/they. War Jax' Freundin und abstrahierte direkt vor Kaufmo.</p>
+    <span class="badge abstract">Abstrahiert</span>
+  </div></div>
+
+  <div class="card"><div class="card-content">
+    <div class="name">Scratch</div>
+    <div class="role">Der gelbe Hund</div>
+    <p class="description">Ein gelber Hund mit rotem Shirt und Cartoon-Handschuhen. Er war der erste Mensch, der im Zirkus abstrahierte. In der echten Welt war er einer der Mit-Entwickler von Caine – und litt dabei an einem Hirntumor.</p>
+    <span class="badge abstract">Abstrahiert</span>
+  </div></div>
+
+  <div class="card"><div class="card-content">
+    <div class="name">Wormo</div>
+    <div class="role">Der Wurm</div>
+    <p class="description">Ein grün-oranges Wurm-an-einer-Schnur-Spielzeug mit Wimpern. Gehörte zur ursprünglichen C&A-Entwicklergruppe.</p>
+    <span class="badge abstract">Abstrahiert</span>
+  </div></div>
+
+  <div class="card"><div class="card-content">
+    <div class="name">Bizco</div>
+    <div class="role">Der Harlekin mit Uhr</div>
+    <p class="description">Ein runder, narrenhafter Charakter mit Punktekleidung und einer riesigen Uhr auf dem Bauch. Ebenfalls Teil der ursprünglichen Gruppe.</p>
+    <span class="badge abstract">Abstrahiert</span>
+  </div></div>
+
+  <div class="card"><div class="card-content">
+    <div class="name">Rattie</div>
+    <div class="role">Die Plüschmaus</div>
+    <p class="description">Ein Plüschtier, das einer blauen Maus mit rosa Streifen, blauen Innenohren und einer roten Blume ähnelt.</p>
+    <span class="badge abstract">Abstrahiert</span>
+  </div></div>
+
+</div>
+
+<footer>
+  <p>🎪 Erstellt auf Basis der Serie von Gooseworx & Glitch Productions 🎪</p>
+  <p style="margin-top: 8px;">Stand: Staffel 1 abgeschlossen</p>
+</footer>
+
+</body>
+</html>
