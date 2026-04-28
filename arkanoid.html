@@ -7,9 +7,7 @@
     <title>Arkanoid – Digital Circus</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        html, body {
-            overscroll-behavior: none;
-        }
+        html, body { overscroll-behavior: none; }
         .game-wrap {
             display: flex;
             flex-direction: column;
@@ -38,15 +36,8 @@
             flex-wrap: wrap;
             justify-content: center;
         }
-        .info {
-            text-align: center;
-            max-width: 560px;
-        }
-        .back-link {
-            color: #fff;
-            text-decoration: underline;
-            font-size: 1.1em;
-        }
+        .info { text-align: center; max-width: 560px; }
+        .back-link { color: #fff; text-decoration: underline; font-size: 1.1em; }
         button.restart {
             font-family: inherit;
             font-size: 1.1em;
@@ -58,14 +49,12 @@
             cursor: pointer;
             touch-action: manipulation;
         }
-        button.restart:hover, button.restart:active {
-            background: #ff8500;
-        }
+        button.restart:hover, button.restart:active { background: #ff8500; }
         .scoreboard {
             width: 100%;
             max-width: 560px;
-            background: rgba(0, 0, 0, 0.35);
-            border: 2px solid rgba(255, 255, 255, 0.3);
+            background: rgba(0,0,0,0.35);
+            border: 2px solid rgba(255,255,255,0.3);
             border-radius: 8px;
             padding: 14px 18px;
         }
@@ -74,7 +63,23 @@
             text-align: center;
             font-size: 1.3em;
             color: #ffb703;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
+        .sync-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: #555;
+            flex-shrink: 0;
+            transition: background 0.3s;
+        }
+        .sync-dot.syncing { background: #ffb703; animation: blink 1s infinite; }
+        .sync-dot.ok      { background: #4caf50; }
+        .sync-dot.error   { background: #f44336; }
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
         .scoreboard ol {
             list-style: none;
             padding: 0;
@@ -87,36 +92,19 @@
             grid-template-columns: 2.2em 1fr auto;
             gap: 10px;
             padding: 6px 4px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+            border-bottom: 1px solid rgba(255,255,255,0.12);
             align-items: baseline;
         }
-        .scoreboard li:last-child {
-            border-bottom: none;
-        }
-        .scoreboard li::before {
-            content: counter(rank) ".";
-            color: #ffb703;
-            font-weight: bold;
-            text-align: right;
-        }
-        .scoreboard li.new {
-            background: rgba(255, 133, 0, 0.25);
-            border-radius: 4px;
-        }
-        .scoreboard .empty {
-            text-align: center;
-            opacity: 0.6;
-            padding: 8px;
-        }
-        .scoreboard .points {
-            font-weight: bold;
-            color: #ffb703;
-        }
+        .scoreboard li:last-child { border-bottom: none; }
+        .scoreboard li::before { content: counter(rank) "."; color: #ffb703; font-weight: bold; text-align: right; }
+        .scoreboard li.new { background: rgba(255,133,0,0.25); border-radius: 4px; }
+        .scoreboard .empty { text-align: center; opacity: 0.6; padding: 8px; }
+        .scoreboard .points { font-weight: bold; color: #ffb703; }
         .scoreboard .clear {
             display: block;
             margin: 10px auto 0;
             background: none;
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            border: 1px solid rgba(255,255,255,0.3);
             color: #fff;
             font-family: inherit;
             font-size: 0.85em;
@@ -125,39 +113,18 @@
             cursor: pointer;
             opacity: 0.7;
         }
-        .scoreboard .clear:hover {
-            opacity: 1;
-        }
+        .scoreboard .clear:hover { opacity: 1; }
         @media (max-width: 640px) {
-            body {
-                padding: 12px 8px;
-            }
-            h1 {
-                font-size: 1.8em;
-                margin-bottom: 4px;
-            }
-            .subtitle {
-                font-size: 0.95em;
-                margin-top: 0;
-            }
-            .hud {
-                font-size: 1em;
-                gap: 14px;
-            }
-            .info {
-                font-size: 0.9em;
-            }
+            body { padding: 12px 8px; }
+            h1 { font-size: 1.8em; margin-bottom: 4px; }
+            .subtitle { font-size: 0.95em; margin-top: 0; }
+            .hud { font-size: 1em; gap: 14px; }
+            .info { font-size: 0.9em; }
         }
         @media (orientation: landscape) and (max-height: 500px) {
-            body {
-                padding: 6px;
-            }
-            header {
-                display: none;
-            }
-            canvas {
-                max-height: calc(100vh - 100px);
-            }
+            body { padding: 6px; }
+            header { display: none; }
+            canvas { max-height: calc(100vh - 100px); }
         }
     </style>
 </head>
@@ -180,7 +147,7 @@
             <button class="restart" id="restart">Neu starten</button>
 
             <section class="scoreboard" aria-label="Top 10 Highscores">
-                <h2>🏆 Top 10 Highscores</h2>
+                <h2>🏆 Top 10 Highscores <span class="sync-dot" id="syncDot" title="Sync-Status"></span></h2>
                 <ol id="scores"></ol>
                 <button type="button" class="clear" id="clearScores">Liste löschen</button>
             </section>
@@ -194,58 +161,242 @@
         </div>
     </div>
 
-    <script>
-        const canvas = document.getElementById('game');
-        const ctx = canvas.getContext('2d');
-        const scoreEl = document.getElementById('score');
-        const livesEl = document.getElementById('lives');
-        const levelEl = document.getElementById('level');
-        const restartBtn = document.getElementById('restart');
-        const scoresEl = document.getElementById('scores');
+    <script type="module">
+        import { createRxDatabase, addRxPlugin } from 'https://esm.sh/rxdb@15';
+        import { getRxStorageDexie }             from 'https://esm.sh/rxdb@15/plugins/storage-dexie';
+        import { replicateRxCollection }         from 'https://esm.sh/rxdb@15/plugins/replication';
+        import { RxDBLeaderElectionPlugin }      from 'https://esm.sh/rxdb@15/plugins/leader-election';
+        import { Observable }                    from 'https://esm.sh/rxjs@7';
+
+        addRxPlugin(RxDBLeaderElectionPlugin);
+
+        // ── Config ────────────────────────────────────────────────────────────────
+        const RXFT_TOKEN  = 'rxft_bab9f1c7b33f7a9376e0c65631a6af1e7e9382f41e476e4d2f7f0dbf077afd87';
+        const RXFORGE_APP = 'e4d1cafa-0c96-4645-8407-967a4eb14535';
+        const BASE_URL    = 'https://rxforge.de';
+        const SYNC_URL    = `${BASE_URL}/api/v1/sync/${RXFORGE_APP}`;
+        const MAX_SCORES  = 10;
+
+        // ── DOM ──────────────────────────────────────────────────────────────────
+        const canvas         = document.getElementById('game');
+        const ctx            = canvas.getContext('2d');
+        const scoreEl        = document.getElementById('score');
+        const livesEl        = document.getElementById('lives');
+        const levelEl        = document.getElementById('level');
+        const restartBtn     = document.getElementById('restart');
+        const scoresEl       = document.getElementById('scores');
         const clearScoresBtn = document.getElementById('clearScores');
+        const syncDot        = document.getElementById('syncDot');
 
-        const SCORES_KEY = 'xddcc.arkanoid.scores';
-        const MAX_SCORES = 10;
+        // ── Sync-Status UI ────────────────────────────────────────────────────────
+        function setSyncStatus(state) {
+            syncDot.className = `sync-dot ${state}`;
+            syncDot.title = { syncing: 'Synchronisierung…', ok: 'Synchronisiert', error: 'Sync-Fehler' }[state] ?? '';
+        }
 
-        function loadScores() {
-            try {
-                const raw = localStorage.getItem(SCORES_KEY);
-                if (!raw) return [];
-                const list = JSON.parse(raw);
-                return Array.isArray(list) ? list : [];
-            } catch (_) {
-                return [];
+        // ── JWT-Cache für Push-Requests ───────────────────────────────────────────
+        let _jwtCache = null;
+
+        async function getWriteToken() {
+            const now = Date.now();
+            if (_jwtCache && _jwtCache.expiresAt - now > 2 * 60_000) return _jwtCache.token;
+            const res = await fetch(`${BASE_URL}/api/v1/auth/token/exchange`, {
+                method:  'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body:    JSON.stringify({ token: RXFT_TOKEN }),
+            });
+            if (!res.ok) throw new Error(`Token exchange failed: ${res.status}`);
+            const { access_token, expires_in } = await res.json();
+            _jwtCache = { token: access_token, expiresAt: now + expires_in * 1_000 };
+            return _jwtCache.token;
+        }
+
+        // ── RxDB Init ─────────────────────────────────────────────────────────────
+        const db = await createRxDatabase({
+            name:    'arkanoid_scores_v2',
+            storage: getRxStorageDexie(),
+        });
+
+        await db.addCollections({
+            scores: {
+                schema: {
+                    version:    0,
+                    primaryKey: 'id',
+                    type:       'object',
+                    properties: {
+                        id:        { type: 'string', maxLength: 100 },
+                        name:      { type: 'string', maxLength: 16  },
+                        points:    { type: 'number' },
+                        level:     { type: 'number' },
+                        date:      { type: 'string', maxLength: 50  },
+                        updatedAt: { type: 'number' },
+                    },
+                    required: ['id'],
+                },
+                conflictHandler: async ({ newDocumentState, realMasterState }) => {
+                    if (newDocumentState.updatedAt === realMasterState.updatedAt) {
+                        return { isEqual: true, documentData: realMasterState };
+                    }
+                    return {
+                        isEqual:      false,
+                        documentData: newDocumentState.updatedAt >= realMasterState.updatedAt
+                            ? newDocumentState
+                            : realMasterState,
+                    };
+                },
+            },
+        });
+
+        // ── RxForge Replication ───────────────────────────────────────────────────
+        function stripMeta(doc) {
+            if (!doc) return null;
+            const { _meta, _attachments, _rev, ...clean } = doc;
+            return clean;
+        }
+
+        const pullStream$ = new Observable(subscriber => {
+            let cancelled  = false;
+            let retryDelay = 1_000;
+
+            async function connect() {
+                if (cancelled) return;
+                try {
+                    const res = await fetch(`${SYNC_URL}/stream`, {
+                        headers: { Authorization: `Bearer ${RXFT_TOKEN}` },
+                    });
+                    if (!res.ok) throw new Error(`SSE HTTP ${res.status}`);
+                    retryDelay = 1_000;
+                    const reader  = res.body.getReader();
+                    const decoder = new TextDecoder();
+                    let buf = '';
+                    while (!cancelled) {
+                        const { value, done } = await reader.read();
+                        if (done) break;
+                        buf += decoder.decode(value, { stream: true });
+                        const lines = buf.split('\n');
+                        buf = lines.pop();
+                        for (const line of lines) {
+                            if (line.startsWith('data:')) {
+                                try { subscriber.next(JSON.parse(line.slice(5).trim())); } catch (_) {}
+                            }
+                        }
+                    }
+                } catch (e) {
+                    if (!cancelled) {
+                        setSyncStatus('error');
+                        console.error('[RxForge] SSE retry in', retryDelay, 'ms:', e);
+                        setTimeout(connect, retryDelay);
+                        retryDelay = Math.min(retryDelay * 2, 30_000);
+                    }
+                    return;
+                }
+                if (!cancelled) setTimeout(connect, 1_000);
             }
+
+            connect();
+            return () => { cancelled = true; };
+        });
+
+        const replication = replicateRxCollection({
+            collection:            db.scores,
+            replicationIdentifier: `rxforge-${RXFORGE_APP}`,
+            live:                  true,
+            retryTime:             5_000,
+
+            pull: {
+                batchSize: 100,
+                stream$:   pullStream$,
+                handler:   async (checkpoint, batchSize) => {
+                    try {
+                        const ck  = checkpoint ?? '';
+                        const res = await fetch(
+                            `${SYNC_URL}/pull?checkpoint=${encodeURIComponent(ck)}&limit=${batchSize}`,
+                            { headers: { Authorization: `Bearer ${RXFT_TOKEN}` } },
+                        );
+                        const data = await res.json();
+                        setSyncStatus('ok');
+                        return { documents: data.documents ?? [], checkpoint: data.checkpoint ?? checkpoint };
+                    } catch (e) {
+                        setSyncStatus('error');
+                        console.error('[RxForge] Pull error:', e);
+                        return { documents: [], checkpoint };
+                    }
+                },
+            },
+
+            push: {
+                batchSize: 50,
+                handler:   async (rows) => {
+                    setSyncStatus('syncing');
+                    try {
+                        const jwt = await getWriteToken();
+                        const res = await fetch(`${SYNC_URL}/push`, {
+                            method:  'POST',
+                            headers: { Authorization: `Bearer ${jwt}`, 'Content-Type': 'application/json' },
+                            body:    JSON.stringify({
+                                rows: rows.map(row => ({
+                                    assumed_master_state: row.assumedMasterState ? stripMeta(row.assumedMasterState) : null,
+                                    new_document_state:   stripMeta(row.newDocumentState),
+                                })),
+                            }),
+                        });
+                        const data = await res.json();
+                        setSyncStatus('ok');
+                        return data.conflicts ?? [];
+                    } catch (e) {
+                        setSyncStatus('error');
+                        console.error('[RxForge] Push error:', e);
+                        throw e;
+                    }
+                },
+            },
+        });
+
+        replication.error$.subscribe(err => {
+            setSyncStatus('error');
+            console.error('[RxForge] Replication error:', err);
+        });
+
+        // ── Score Helpers ─────────────────────────────────────────────────────────
+        async function loadScores() {
+            const docs = await db.scores.find().exec();
+            return docs.map(d => d.toJSON())
+                .sort((a, b) => b.points - a.points)
+                .slice(0, MAX_SCORES);
         }
 
-        function saveScores(list) {
-            try { localStorage.setItem(SCORES_KEY, JSON.stringify(list)); } catch (_) {}
-        }
-
-        function qualifies(points) {
+        async function qualifies(points) {
             if (points <= 0) return false;
-            const list = loadScores();
+            const list = await loadScores();
             if (list.length < MAX_SCORES) return true;
             return points > list[list.length - 1].points;
         }
 
-        function submitScore(points, name, levelReached) {
-            const list = loadScores();
-            const entry = {
-                name: (name || 'Anonym').slice(0, 16),
-                points,
-                level: levelReached,
-                date: new Date().toISOString(),
-            };
-            list.push(entry);
-            list.sort((a, b) => b.points - a.points);
-            const trimmed = list.slice(0, MAX_SCORES);
-            saveScores(trimmed);
-            return trimmed.indexOf(entry);
+        let highlightId = null;
+
+        function generateId() {
+            const b = crypto.getRandomValues(new Uint8Array(16));
+            b[6] = (b[6] & 0x0f) | 0x40;
+            b[8] = (b[8] & 0x3f) | 0x80;
+            const h = [...b].map(x => x.toString(16).padStart(2, '0')).join('');
+            return `${h.slice(0,8)}-${h.slice(8,12)}-${h.slice(12,16)}-${h.slice(16,20)}-${h.slice(20)}`;
         }
 
-        function renderScores(highlightIndex = -1) {
-            const list = loadScores();
+        async function submitScore(points, name, levelReached) {
+            const entry = {
+                id:        generateId(),
+                name:      (name || 'Anonym').slice(0, 16),
+                points,
+                level:     levelReached,
+                date:      new Date().toISOString(),
+                updatedAt: Date.now(),
+            };
+            highlightId = entry.id;
+            await db.scores.insert(entry);
+            setTimeout(() => { highlightId = null; }, 6_000);
+        }
+
+        function renderScoresList(list) {
             scoresEl.innerHTML = '';
             if (list.length === 0) {
                 const li = document.createElement('li');
@@ -255,126 +406,103 @@
                 scoresEl.appendChild(li);
                 return;
             }
-            list.forEach((entry, i) => {
-                const li = document.createElement('li');
-                if (i === highlightIndex) li.className = 'new';
-                const name = document.createElement('span');
-                name.textContent = entry.name;
+            list.forEach(entry => {
+                const li  = document.createElement('li');
+                if (entry.id === highlightId) li.className = 'new';
+                const nm  = document.createElement('span');
+                nm.textContent  = entry.name;
                 const pts = document.createElement('span');
-                pts.className = 'points';
+                pts.className   = 'points';
                 pts.textContent = entry.points + ' Pkt.';
-                li.appendChild(name);
+                li.appendChild(nm);
                 li.appendChild(pts);
                 scoresEl.appendChild(li);
             });
         }
 
-        clearScoresBtn.addEventListener('click', () => {
+        db.scores.find().$.subscribe(docs => {
+            const list = docs.map(d => d.toJSON())
+                .sort((a, b) => b.points - a.points)
+                .slice(0, MAX_SCORES);
+            renderScoresList(list);
+        });
+
+        clearScoresBtn.addEventListener('click', async () => {
             if (confirm('Alle Highscores löschen?')) {
-                saveScores([]);
-                renderScores();
+                const docs = await db.scores.find().exec();
+                await Promise.all(docs.map(d => d.remove()));
             }
         });
 
+        // ── Game Logic ────────────────────────────────────────────────────────────
         const W = canvas.width;
         const H = canvas.height;
 
         const paddle = { w: 100, h: 14, x: W / 2 - 50, y: H - 40, speed: 7 };
-        const ball = { x: W / 2, y: paddle.y - 10, r: 8, vx: 0, vy: 0, stuck: true };
+        const ball   = { x: W / 2, y: paddle.y - 10, r: 8, vx: 0, vy: 0, stuck: true };
 
         const brick = { cols: 8, w: 60, h: 22, padX: 8, padY: 10, offTop: 60 };
         const HIT_COLORS = { 1: '#ff8500', 2: '#c9184a', 3: '#2d0a4e' };
 
         const LEVELS = [
-            { rows: 3, pattern: 'full',     paddleW: 110, baseSpeed: 6.0, speedGain: 1.000, toughRows: 0 },
-            { rows: 4, pattern: 'full',     paddleW: 100, baseSpeed: 6.5, speedGain: 1.010, toughRows: 0 },
-            { rows: 5, pattern: 'pyramid',  paddleW:  90, baseSpeed: 7.0, speedGain: 1.015, toughRows: 1 },
-            { rows: 6, pattern: 'gaps',     paddleW:  80, baseSpeed: 7.5, speedGain: 1.020, toughRows: 2 },
-            { rows: 7, pattern: 'checker',  paddleW:  70, baseSpeed: 8.0, speedGain: 1.025, toughRows: 3 },
+            { rows: 3, pattern: 'full',    paddleW: 110, baseSpeed: 6.0, speedGain: 1.000, toughRows: 0 },
+            { rows: 4, pattern: 'full',    paddleW: 100, baseSpeed: 6.5, speedGain: 1.010, toughRows: 0 },
+            { rows: 5, pattern: 'pyramid', paddleW:  90, baseSpeed: 7.0, speedGain: 1.015, toughRows: 1 },
+            { rows: 6, pattern: 'gaps',    paddleW:  80, baseSpeed: 7.5, speedGain: 1.020, toughRows: 2 },
+            { rows: 7, pattern: 'checker', paddleW:  70, baseSpeed: 8.0, speedGain: 1.025, toughRows: 3 },
         ];
         const MAX_BALL_SPEED = 14;
 
-        function levelConfig() {
-            return LEVELS[Math.min(level, LEVELS.length) - 1];
-        }
+        function levelConfig() { return LEVELS[Math.min(level, LEVELS.length) - 1]; }
 
         function patternVisible(pattern, r, c, rows, cols) {
-            if (pattern === 'full') return true;
-            if (pattern === 'pyramid') {
-                const inset = (rows - 1 - r);
-                return c >= inset && c < cols - inset;
-            }
-            if (pattern === 'gaps') {
-                return c % 3 !== 2;
-            }
-            if (pattern === 'checker') {
-                return (r + c) % 2 === 0 || r === 0 || r === rows - 1;
-            }
+            if (pattern === 'full')    return true;
+            if (pattern === 'pyramid') { const inset = rows - 1 - r; return c >= inset && c < cols - inset; }
+            if (pattern === 'gaps')    return c % 3 !== 2;
+            if (pattern === 'checker') return (r + c) % 2 === 0 || r === 0 || r === rows - 1;
             return true;
         }
 
-        let bricks = [];
-        let score = 0;
-        let lives = 3;
-        let level = 1;
-        let gameOver = false;
-        let won = false;
-        let scoreHandled = false;
+        let bricks = [], score = 0, lives = 3, level = 1;
+        let gameOver = false, won = false, scoreHandled = false;
 
-        function endGame(didWin) {
+        async function endGame(didWin) {
             if (gameOver) return;
-            gameOver = true;
-            won = didWin;
+            gameOver = true; won = didWin;
             if (scoreHandled) return;
             scoreHandled = true;
-            setTimeout(() => {
-                if (!qualifies(score)) {
-                    renderScores();
-                    return;
-                }
-                const defaultName = localStorage.getItem('xddcc.arkanoid.lastName') || '';
-                const name = (prompt('🎉 Highscore! Dein Name:', defaultName) || '').trim();
-                try { localStorage.setItem('xddcc.arkanoid.lastName', name); } catch (_) {}
-                const idx = submitScore(score, name, level);
-                renderScores(idx);
-            }, 50);
+            await new Promise(r => setTimeout(r, 50));
+            if (!(await qualifies(score))) return;
+            const defaultName = localStorage.getItem('xddcc.arkanoid.lastName') || '';
+            const name = (prompt('🎉 Highscore! Dein Name:', defaultName) || '').trim();
+            try { localStorage.setItem('xddcc.arkanoid.lastName', name); } catch (_) {}
+            await submitScore(score, name, level);
         }
 
         const keys = {};
-        document.addEventListener('keydown', (e) => {
+        document.addEventListener('keydown', e => {
             keys[e.key] = true;
-            if (e.key === ' ' && ball.stuck && !gameOver) {
-                launchBall();
-                e.preventDefault();
-            }
+            if (e.key === ' ' && ball.stuck && !gameOver) { launchBall(); e.preventDefault(); }
         });
-        document.addEventListener('keyup', (e) => { keys[e.key] = false; });
+        document.addEventListener('keyup', e => { keys[e.key] = false; });
 
-        canvas.addEventListener('mousemove', (e) => {
+        canvas.addEventListener('mousemove', e => {
             const rect = canvas.getBoundingClientRect();
-            const scale = canvas.width / rect.width;
-            const mx = (e.clientX - rect.left) * scale;
-            paddle.x = Math.max(0, Math.min(W - paddle.w, mx - paddle.w / 2));
+            paddle.x = Math.max(0, Math.min(W - paddle.w, (e.clientX - rect.left) * (W / rect.width) - paddle.w / 2));
         });
 
-        canvas.addEventListener('click', () => {
-            if (ball.stuck && !gameOver) launchBall();
-        });
+        canvas.addEventListener('click', () => { if (ball.stuck && !gameOver) launchBall(); });
 
-        canvas.addEventListener('touchmove', (e) => {
+        canvas.addEventListener('touchmove', e => {
             e.preventDefault();
             const rect = canvas.getBoundingClientRect();
-            const scale = canvas.width / rect.width;
-            const tx = (e.touches[0].clientX - rect.left) * scale;
-            paddle.x = Math.max(0, Math.min(W - paddle.w, tx - paddle.w / 2));
+            paddle.x = Math.max(0, Math.min(W - paddle.w, (e.touches[0].clientX - rect.left) * (W / rect.width) - paddle.w / 2));
         }, { passive: false });
 
-        canvas.addEventListener('touchstart', (e) => {
+        canvas.addEventListener('touchstart', e => {
             e.preventDefault();
             const rect = canvas.getBoundingClientRect();
-            const scale = canvas.width / rect.width;
-            const tx = (e.touches[0].clientX - rect.left) * scale;
-            paddle.x = Math.max(0, Math.min(W - paddle.w, tx - paddle.w / 2));
+            paddle.x = Math.max(0, Math.min(W - paddle.w, (e.touches[0].clientX - rect.left) * (W / rect.width) - paddle.w / 2));
             if (ball.stuck && !gameOver) launchBall();
         }, { passive: false });
 
@@ -382,20 +510,14 @@
 
         function buildBricks() {
             bricks = [];
-            const cfg = levelConfig();
-            const totalW = brick.cols * brick.w + (brick.cols - 1) * brick.padX;
+            const cfg     = levelConfig();
+            const totalW  = brick.cols * brick.w + (brick.cols - 1) * brick.padX;
             const offLeft = (W - totalW) / 2;
             for (let r = 0; r < cfg.rows; r++) {
                 for (let c = 0; c < brick.cols; c++) {
                     if (!patternVisible(cfg.pattern, r, c, cfg.rows, brick.cols)) continue;
                     const hits = Math.min(3, Math.max(1, cfg.toughRows - r + 1));
-                    bricks.push({
-                        x: offLeft + c * (brick.w + brick.padX),
-                        y: brick.offTop + r * (brick.h + brick.padY),
-                        maxHits: hits,
-                        hits: hits,
-                        alive: true,
-                    });
+                    bricks.push({ x: offLeft + c * (brick.w + brick.padX), y: brick.offTop + r * (brick.h + brick.padY), maxHits: hits, hits, alive: true });
                 }
             }
         }
@@ -409,9 +531,7 @@
         }
 
         function resetBall() {
-            ball.stuck = true;
-            ball.vx = 0;
-            ball.vy = 0;
+            ball.stuck = true; ball.vx = 0; ball.vy = 0;
             ball.x = paddle.x + paddle.w / 2;
             ball.y = paddle.y - ball.r - 1;
         }
@@ -419,26 +539,16 @@
         function applyLevelSetup() {
             paddle.w = levelConfig().paddleW;
             paddle.x = W / 2 - paddle.w / 2;
-            buildBricks();
-            resetBall();
+            buildBricks(); resetBall();
         }
 
         function resetGame() {
-            score = 0;
-            lives = 3;
-            level = 1;
-            gameOver = false;
-            won = false;
-            scoreHandled = false;
-            applyLevelSetup();
-            updateHud();
+            score = 0; lives = 3; level = 1;
+            gameOver = false; won = false; scoreHandled = false;
+            applyLevelSetup(); updateHud();
         }
 
-        function nextLevel() {
-            level += 1;
-            applyLevelSetup();
-            updateHud();
-        }
+        function nextLevel() { level += 1; applyLevelSetup(); updateHud(); }
 
         function updateHud() {
             scoreEl.textContent = score;
@@ -449,55 +559,41 @@
         function update() {
             if (gameOver) return;
 
-            if (keys['ArrowLeft'] || keys['a'] || keys['A']) paddle.x -= paddle.speed;
+            if (keys['ArrowLeft']  || keys['a'] || keys['A']) paddle.x -= paddle.speed;
             if (keys['ArrowRight'] || keys['d'] || keys['D']) paddle.x += paddle.speed;
             paddle.x = Math.max(0, Math.min(W - paddle.w, paddle.x));
 
-            if (ball.stuck) {
-                ball.x = paddle.x + paddle.w / 2;
-                ball.y = paddle.y - ball.r - 1;
-                return;
-            }
+            if (ball.stuck) { ball.x = paddle.x + paddle.w / 2; ball.y = paddle.y - ball.r - 1; return; }
 
             ball.x += ball.vx;
             ball.y += ball.vy;
 
-            if (ball.x - ball.r < 0) { ball.x = ball.r; ball.vx *= -1; }
+            if (ball.x - ball.r < 0) { ball.x = ball.r;     ball.vx *= -1; }
             if (ball.x + ball.r > W) { ball.x = W - ball.r; ball.vx *= -1; }
-            if (ball.y - ball.r < 0) { ball.y = ball.r; ball.vy *= -1; }
+            if (ball.y - ball.r < 0) { ball.y = ball.r;     ball.vy *= -1; }
 
             if (
-                ball.y + ball.r >= paddle.y &&
-                ball.y + ball.r <= paddle.y + paddle.h &&
-                ball.x >= paddle.x &&
-                ball.x <= paddle.x + paddle.w &&
-                ball.vy > 0
+                ball.y + ball.r >= paddle.y && ball.y + ball.r <= paddle.y + paddle.h &&
+                ball.x >= paddle.x && ball.x <= paddle.x + paddle.w && ball.vy > 0
             ) {
-                const hit = (ball.x - (paddle.x + paddle.w / 2)) / (paddle.w / 2);
+                const hit   = (ball.x - (paddle.x + paddle.w / 2)) / (paddle.w / 2);
                 const angle = hit * (Math.PI / 3);
                 const speed = Math.min(MAX_BALL_SPEED, Math.hypot(ball.vx, ball.vy) * levelConfig().speedGain);
                 ball.vx = speed * Math.sin(angle);
                 ball.vy = -Math.abs(speed * Math.cos(angle));
-                ball.y = paddle.y - ball.r - 1;
+                ball.y  = paddle.y - ball.r - 1;
             }
 
             for (const b of bricks) {
                 if (!b.alive) continue;
-                if (
-                    ball.x + ball.r > b.x &&
-                    ball.x - ball.r < b.x + brick.w &&
-                    ball.y + ball.r > b.y &&
-                    ball.y - ball.r < b.y + brick.h
-                ) {
-                    b.hits -= 1;
-                    score += 10 * b.maxHits;
+                if (ball.x + ball.r > b.x && ball.x - ball.r < b.x + brick.w &&
+                    ball.y + ball.r > b.y && ball.y - ball.r < b.y + brick.h) {
+                    b.hits  -= 1;
+                    score   += 10 * b.maxHits;
                     if (b.hits <= 0) b.alive = false;
                     updateHud();
-
-                    const prevX = ball.x - ball.vx;
-                    const prevY = ball.y - ball.vy;
-                    const fromSide = prevX < b.x || prevX > b.x + brick.w;
-                    const fromTopBottom = prevY < b.y || prevY > b.y + brick.h;
+                    const fromSide      = (ball.x - ball.vx) < b.x || (ball.x - ball.vx) > b.x + brick.w;
+                    const fromTopBottom = (ball.y - ball.vy) < b.y || (ball.y - ball.vy) > b.y + brick.h;
                     if (fromSide && !fromTopBottom) ball.vx *= -1;
                     else ball.vy *= -1;
                     break;
@@ -505,14 +601,13 @@
             }
 
             if (ball.y - ball.r > H) {
-                lives -= 1;
-                updateHud();
-                if (lives <= 0) endGame(false);
+                lives -= 1; updateHud();
+                if (lives <= 0) endGame(false).catch(console.warn);
                 else resetBall();
             }
 
-            if (bricks.every((b) => !b.alive)) {
-                if (level >= LEVELS.length) endGame(true);
+            if (bricks.every(b => !b.alive)) {
+                if (level >= LEVELS.length) endGame(true).catch(console.warn);
                 else nextLevel();
             }
         }
@@ -522,13 +617,12 @@
 
             for (const b of bricks) {
                 if (!b.alive) continue;
-                ctx.fillStyle = HIT_COLORS[b.hits] || '#ff8500';
+                ctx.fillStyle   = HIT_COLORS[b.hits] || '#ff8500';
                 ctx.fillRect(b.x, b.y, brick.w, brick.h);
                 ctx.strokeStyle = 'rgba(255,255,255,0.3)';
                 ctx.strokeRect(b.x, b.y, brick.w, brick.h);
                 if (b.maxHits > 1) {
-                    ctx.fillStyle = '#fff';
-                    ctx.textAlign = 'center';
+                    ctx.fillStyle = '#fff'; ctx.textAlign = 'center';
                     ctx.font = 'bold 14px sans-serif';
                     ctx.fillText(b.hits, b.x + brick.w / 2, b.y + brick.h / 2 + 5);
                 }
@@ -545,28 +639,21 @@
             if (gameOver) {
                 ctx.fillStyle = 'rgba(0,0,0,0.6)';
                 ctx.fillRect(0, H / 2 - 60, W, 120);
-                ctx.fillStyle = '#fff';
-                ctx.textAlign = 'center';
+                ctx.fillStyle = '#fff'; ctx.textAlign = 'center';
                 ctx.font = 'bold 36px sans-serif';
                 ctx.fillText(won ? 'Gewonnen! 🎉' : 'Game Over', W / 2, H / 2);
                 ctx.font = '20px sans-serif';
                 ctx.fillText('Punkte: ' + score, W / 2, H / 2 + 32);
             } else if (ball.stuck) {
-                ctx.fillStyle = 'rgba(255,255,255,0.8)';
-                ctx.textAlign = 'center';
+                ctx.fillStyle = 'rgba(255,255,255,0.8)'; ctx.textAlign = 'center';
                 ctx.font = '18px sans-serif';
                 ctx.fillText('Tippen / Klick / Leertaste zum Starten', W / 2, H / 2);
             }
         }
 
-        function loop() {
-            update();
-            draw();
-            requestAnimationFrame(loop);
-        }
+        function loop() { update(); draw(); requestAnimationFrame(loop); }
 
         resetGame();
-        renderScores();
         loop();
     </script>
 </body>
