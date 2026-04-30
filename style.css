@@ -12,6 +12,84 @@ body {
     border-radius: 10px;
 }
 
+/* Zweispaltiges Layout */
+.two-col {
+    display: grid;
+    grid-template-columns: minmax(320px, 700px) 1fr;
+    gap: 60px;
+    align-items: start;
+}
+
+/* Linke Spalte: Video-Player */
+.col-video {
+    position: sticky;
+    top: 30px;
+}
+
+.video-box {
+    background: rgba(0, 0, 0, 0.35);
+    border-radius: 14px;
+    padding: 20px;
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.video-box h2 {
+    margin: 0 0 14px 0;
+    font-size: 1.3em;
+}
+
+#episode-select {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: none;
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+    font-size: 0.95em;
+    font-family: inherit;
+    cursor: pointer;
+    margin-bottom: 14px;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23fff' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 32px;
+}
+
+#episode-select option {
+    background: #3a0a5e;
+    color: #fff;
+}
+
+#episode-select:focus {
+    outline: 2px solid rgba(255, 255, 255, 0.5);
+}
+
+.iframe-wrap {
+    position: relative;
+    padding-bottom: 56.25%;
+    height: 0;
+    overflow: hidden;
+    border-radius: 10px;
+}
+
+.iframe-wrap iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+}
+
+/* Rechte Spalte: Charaktere */
+.col-chars {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
 .name {
     font-size: 2.5em;
     font-weight: bold;
@@ -26,5 +104,16 @@ h1 {
 
 h2 {
     margin-top: 0;
+}
+
+/* Responsive: untereinander auf kleinen Screens */
+@media (max-width: 800px) {
+    .two-col {
+        grid-template-columns: 1fr;
+    }
+
+    .col-video {
+        position: static;
+    }
 }
 
