@@ -241,14 +241,14 @@ const ROW_COLORS = [
     '#ff6666','#ffaa33','#bbff33','#33ffcc',
 ];
 const PILL_DEFS = [
-    { type:'big_paddle',   color:'#22c55e', label:'+PAD', pos:true,  w:10 },
-    { type:'small_paddle', color:'#ef4444', label:'-PAD', pos:false, w: 8 },
-    { type:'gun',          color:'#3b82f6', label:'GUN',  pos:true,  w: 7 },
-    { type:'extra_life',   color:'#f97316', label:'+♥',   pos:true,  w: 5 },
-    { type:'slow_ball',    color:'#a855f7', label:'SLW',  pos:true,  w:10 },
-    { type:'fast_ball',    color:'#ec4899', label:'FST',  pos:false, w: 8 },
-    { type:'extra_ball',   color:'#dc2626', label:'+BLL', pos:false, w: 6 },
-    { type:'diamond',      color:'#00e5ff', label:'💎',   pos:true,  w: 3 },
+    { type:'big_paddle',   color:'#22c55e', label:'+PAD', pos:true,  w:10, toast:'Paddel +',    toastColor:'#22c55e' },
+    { type:'small_paddle', color:'#ef4444', label:'-PAD', pos:false, w: 8, toast:'Paddel –',    toastColor:'#ef4444' },
+    { type:'gun',          color:'#3b82f6', label:'GUN',  pos:true,  w: 7, toast:'Kanone!',     toastColor:'#60a5fa' },
+    { type:'extra_life',   color:'#ff9500', label:'+♥',   pos:true,  w: 5, toast:'+1 Leben ♥',  toastColor:'#ff9500' },
+    { type:'slow_ball',    color:'#a855f7', label:'SLW',  pos:true,  w:10, toast:'Langsam',     toastColor:'#c084fc' },
+    { type:'fast_ball',    color:'#ff006e', label:'FST',  pos:false, w: 8, toast:'Schnell!',    toastColor:'#ff006e' },
+    { type:'extra_ball',   color:'#eab308', label:'+BLL', pos:true,  w: 6, toast:'+Ball',       toastColor:'#fde047' },
+    { type:'diamond',      color:'#00e5ff', label:'💎',   pos:true,  w: 3, toast:null,          toastColor:'#00e5ff' },
 ];
 
 const LEVELS = [
@@ -276,7 +276,7 @@ const LEVELS = [
 
 // ── State ─────────────────────────────────────────────────────────────
 const paddle = { w:110, h:12, x:W/2-55, y:H-30, speed:7 };
-let balls=[], bricks=[], particles=[], pills=[], bullets=[];
+let balls=[], bricks=[], particles=[], pills=[], bullets=[], toasts=[];
 let effects={}, gunTimer=0;
 let score=0, lives=3, level=1;
 let gameOver=false, won=false, scoreHandled=false;
@@ -425,26 +425,41 @@ function effectSpeed() {
          : effects.fastBall>0 ? ballSpeed()*1.5 : ballSpeed();
 }
 
+// ── Floating toast above paddle ───────────────────────────────────────
+function spawnToast(text, color) {
+    toasts.push({ text, color,
+        x: paddle.x + paddle.w / 2,
+        y: paddle.y - 22,
+        vy: -1.4, life: 1.0, decay: 0.011 });
+}
+
 // ── Apply pill ────────────────────────────────────────────────────────
 function applyPill(type) {
     const cfg=levelCfg();
+    const def=PILL_DEFS.find(d=>d.type===type);
     switch(type) {
         case 'big_paddle':
             effects.bigPaddle=EFFECT_TICKS; effects.smallPaddle=0;
-            paddle.w=Math.min(W*0.5, cfg.paddleW*1.6); break;
+            paddle.w=Math.min(W*0.5, cfg.paddleW*1.6);
+            spawnToast('Paddel +', '#22c55e'); break;
         case 'small_paddle':
             effects.smallPaddle=EFFECT_TICKS; effects.bigPaddle=0;
-            paddle.w=Math.max(38, cfg.paddleW*0.55); break;
+            paddle.w=Math.max(38, cfg.paddleW*0.55);
+            spawnToast('Paddel –', '#ef4444'); break;
         case 'gun':
-            effects.gun=EFFECT_TICKS; gunTimer=0; break;
+            effects.gun=EFFECT_TICKS; gunTimer=0;
+            spawnToast('Kanone!', '#60a5fa'); break;
         case 'extra_life':
-            lives=Math.min(9,lives+1); updateHud(); break;
+            lives=Math.min(9,lives+1); updateHud();
+            spawnToast('+1 Leben ♥', '#ff9500'); break;
         case 'slow_ball':
             if (effects.fastBall>0){effects.fastBall=0;normSpeeds(ballSpeed());}
-            else {effects.slowBall=EFFECT_TICKS;normSpeeds(ballSpeed()*0.62);} break;
+            else {effects.slowBall=EFFECT_TICKS;normSpeeds(ballSpeed()*0.62);}
+            spawnToast('Langsam', '#c084fc'); break;
         case 'fast_ball':
             if (effects.slowBall>0){effects.slowBall=0;normSpeeds(ballSpeed());}
-            else {effects.fastBall=EFFECT_TICKS;normSpeeds(ballSpeed()*1.5);} break;
+            else {effects.fastBall=EFFECT_TICKS;normSpeeds(ballSpeed()*1.5);}
+            spawnToast('Schnell!', '#ff006e'); break;
         case 'extra_ball':
             if (balls.length<MAX_BALLS) {
                 const spd=effectSpeed();
@@ -452,10 +467,12 @@ function applyPill(type) {
                     y:paddle.y-12, r:6, stuck:false,
                     vx:(Math.random()-0.5)*2.5, vy:-spd });
             }
-            break;
-        case 'diamond':
-            score+=500+level*100; updateHud();
-            explode(paddle.x+paddle.w/2, paddle.y, '#00e5ff', 20); break;
+            spawnToast('+Ball', '#fde047'); break;
+        case 'diamond': {
+            const pts=500+level*100; score+=pts; updateHud();
+            explode(paddle.x+paddle.w/2, paddle.y, '#00e5ff', 20);
+            spawnToast(`+${pts} Pkt!`, '#00e5ff'); break;
+        }
     }
 }
 
@@ -474,7 +491,7 @@ function launchBall() {
 function applyLevelSetup() {
     const cfg=levelCfg();
     paddle.w=cfg.paddleW; paddle.x=W/2-paddle.w/2;
-    balls=[newStuckBall()]; bullets=[]; pills=[]; particles=[];
+    balls=[newStuckBall()]; bullets=[]; pills=[]; particles=[]; toasts=[];
     resetEffects(); buildBricks();
 }
 function resetGame() {
@@ -632,6 +649,14 @@ function update(dt) {
         if (p.life<=0) particles.splice(i,1);
     }
 
+    // Toasts
+    for (let i=toasts.length-1;i>=0;i--) {
+        const t=toasts[i];
+        t.y+=t.vy*dt;
+        t.life-=t.decay*dt;
+        if (t.life<=0) toasts.splice(i,1);
+    }
+
     if (!gameOver && bricks.every(b=>!b.alive)) {
         if (level>=LEVELS.length) endGame(true).catch(console.warn);
         else nextLevel();
@@ -738,6 +763,21 @@ function draw() {
     }
 
     drawEffectsBar();
+
+    // Toasts
+    ctx.save();
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.font='bold 15px sans-serif';
+    for (const t of toasts) {
+        const a=Math.max(0,t.life);
+        ctx.globalAlpha=a*0.45;
+        ctx.fillStyle='#000';
+        ctx.fillText(t.text, t.x+1, t.y+1);
+        ctx.globalAlpha=a;
+        ctx.fillStyle=t.color;
+        ctx.fillText(t.text, t.x, t.y);
+    }
+    ctx.restore();
 
     // Overlay
     if (gameOver) {
