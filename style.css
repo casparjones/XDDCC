@@ -98,7 +98,8 @@ body {
 }
 
 h1 {
-    font-size: 2.8em;
+    font-size: clamp(1.2rem, 5.5vw, 2.8em);
+    white-space: nowrap;
     margin-top: 0;
 }
 
@@ -107,13 +108,35 @@ h2 {
 }
 
 /* Responsive: untereinander auf kleinen Screens */
-@media (max-width: 800px) {
+@media (max-width: 1024px) {
+    body {
+        padding: 16px 10px;
+    }
+
     .two-col {
         grid-template-columns: 1fr;
+        gap: 24px;
     }
 
     .col-video {
         position: static;
+        order: -1;
+        margin-left: -10px;
+        margin-right: -10px;
+        width: calc(100% + 20px);
+    }
+
+    .video-box {
+        border-radius: 0;
+        padding: 10px;
+    }
+
+    .col-chars {
+        order: 0;
+    }
+
+    .name {
+        font-size: 1.9em;
     }
 }
 
