@@ -29,7 +29,6 @@ const livesEl        = document.getElementById('lives');
 const levelEl        = document.getElementById('level');
 const restartBtn     = document.getElementById('restart');
 const scoresEl       = document.getElementById('scores');
-const clearScoresBtn = document.getElementById('clearScores');
 const syncDot        = document.getElementById('syncDot');
 
 function setSyncStatus(s) {
@@ -187,12 +186,6 @@ function renderScoresList(list) {
 db.scores.find().$.subscribe(docs =>
     renderScoresList(docs.map(d=>d.toJSON()).sort((a,b)=>b.points-a.points).slice(0,MAX_SCORES))
 );
-clearScoresBtn.addEventListener('click', async () => {
-    if (confirm('Alle Highscores löschen?')) {
-        const docs = await db.scores.find().exec();
-        await Promise.all(docs.map(d=>d.remove()));
-    }
-});
 
 // ═══════════════════════════════════════════════════════════════════════
 // GAME
