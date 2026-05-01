@@ -37,8 +37,8 @@
             box-shadow: 0 0 26px rgba(255, 133, 0, 0.5);
             display: block;
             width: 100%;
-            max-width: 784px;
-            height: auto;
+            aspect-ratio: 784 / 448;
+            max-height: calc(100svh - 320px);
             touch-action: none;
             user-select: none;
             -webkit-user-select: none;
@@ -135,7 +135,7 @@
             canvas { border-radius: 4px; }
         }
         @media (orientation: landscape) and (max-height: 480px) {
-            canvas { max-height: calc(100svh - 70px); }
+            canvas { max-height: calc(100svh - 80px); }
         }
 
     </style>

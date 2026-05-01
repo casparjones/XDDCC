@@ -804,17 +804,22 @@ function drawEffectsBar() {
     if (effects.smallPaddle>0) act.push({label:'-PAD',color:'#ef4444',t:effects.smallPaddle});
     if (effects.gun>0)         act.push({label:'GUN', color:'#3b82f6',t:effects.gun});
     if (effects.slowBall>0)    act.push({label:'SLW', color:'#a855f7',t:effects.slowBall});
-    if (effects.fastBall>0)    act.push({label:'FST', color:'#ec4899',t:effects.fastBall});
+    if (effects.fastBall>0)    act.push({label:'FST', color:'#ff006e',t:effects.fastBall});
     if (!act.length) return;
-    const iw=40,ih=13,gap=4,y0=H-17;
-    ctx.font='bold 8px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    const iw=44, ih=22, gap=4, y0=H-ih-4;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
     for (let i=0;i<act.length;i++) {
         const e=act[i], x=6+i*(iw+gap), ratio=Math.max(0,e.t/EFFECT_TICKS);
         ctx.fillStyle=e.color; ctx.globalAlpha=0.2+ratio*0.75;
-        ctx.beginPath(); ctx.roundRect(x,y0,iw,ih,3); ctx.fill();
+        ctx.beginPath(); ctx.roundRect(x,y0,iw,ih,4); ctx.fill();
         ctx.strokeStyle=e.color; ctx.lineWidth=1; ctx.globalAlpha=0.6+ratio*0.4; ctx.stroke();
-        ctx.globalAlpha=1; ctx.fillStyle='#fff';
-        ctx.fillText(e.label,x+iw/2,y0+ih/2);
+        ctx.globalAlpha=1;
+        ctx.fillStyle='#fff';
+        ctx.font='bold 8px sans-serif';
+        ctx.fillText(e.label, x+iw/2, y0+7);
+        ctx.font='9px sans-serif';
+        ctx.fillStyle='rgba(255,255,255,0.8)';
+        ctx.fillText(Math.ceil(e.t/60)+'s', x+iw/2, y0+16);
     }
     ctx.globalAlpha=1;
 }
