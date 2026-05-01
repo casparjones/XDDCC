@@ -14,6 +14,16 @@ const MAX_SCORES  = 10;
 
 const canvas         = document.getElementById('game');
 const ctx            = canvas.getContext('2d');
+function resizeCanvas() {
+    const dpr = window.devicePixelRatio || 1;
+    const cssW = canvas.clientWidth;
+    const cssH = canvas.clientHeight;
+    if (cssW > 0 && cssH > 0) {
+        canvas.width  = Math.round(cssW * dpr);
+        canvas.height = Math.round(cssH * dpr);
+    }
+}
+window.addEventListener('resize', resizeCanvas);
 const scoreEl        = document.getElementById('score');
 const livesEl        = document.getElementById('lives');
 const levelEl        = document.getElementById('level');
@@ -187,8 +197,8 @@ clearScoresBtn.addEventListener('click', async () => {
 // ═══════════════════════════════════════════════════════════════════════
 // GAME
 // ═══════════════════════════════════════════════════════════════════════
-const W = canvas.width;   // 784
-const H = canvas.height;  // 448
+const W = 784;  // logical game width
+const H = 448;  // logical game height
 
 // ── 3×5 pixel font for text levels ────────────────────────────────────
 // Each letter is a 5-row × 3-col binary grid (1=brick, 0=gap).
@@ -665,6 +675,8 @@ function update(dt) {
 
 // ── Draw ──────────────────────────────────────────────────────────────
 function draw() {
+    const sx = canvas.width / W, sy = canvas.height / H;
+    ctx.setTransform(sx, 0, 0, sy, 0, 0);
     ctx.clearRect(0,0,W,H);
 
     // Faint level name watermark
@@ -796,6 +808,7 @@ function draw() {
         ctx.font='13px sans-serif'; ctx.fillStyle='rgba(255,183,3,0.85)';
         ctx.fillText(`Level ${level} / ${LEVELS.length}`,W/2,H/2+24);
     }
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
 }
 
 function drawEffectsBar() {
@@ -835,7 +848,7 @@ function shadeColor(hex,amt) {
 // This keeps ball speed identical in wall-clock time regardless of device frame rate.
 let lastTs = null;
 function loop(ts) {
-    if (lastTs === null) { lastTs = ts; requestAnimationFrame(loop); return; }
+    if (lastTs === null) { resizeCanvas(); lastTs = ts; requestAnimationFrame(loop); return; }
     const dt = Math.min((ts - lastTs) / 16.667, 2.5); // cap at 2.5× to handle tab-focus lag
     lastTs = ts;
     update(dt);
